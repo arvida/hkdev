@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+#
+# Cross-platform way of finding an executable in the $PATH.
+#
+#   which('ruby') #=> /usr/bin/ruby
+#
+def which(cmd)
+  exts = ENV['PATHEXT'] ? ENV['PATHEXT'].split(';') : ['']
+  ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+    exts.each { |ext|
+      exe = "#{path}/#{cmd}#{ext}"
+      return exe if File.executable? exe
+    }
+  end
+  return nil
+end
+
+unless which("vagrant")
+  puts "Please install Vagrant first http://docs.vagrantup.com/v1/docs/getting-started/"
+  exit 1
+end
+`vagrant box add lucid64 http://files.vagrantup.com/lucid64.box`
+vagrant_working_dir = File.dirname(__FILE__) + '/../lib/dyno/'
+`cd #{vagrant_working_dir} && vagrant up`
